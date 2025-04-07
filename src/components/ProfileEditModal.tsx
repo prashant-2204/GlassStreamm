@@ -28,11 +28,13 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
-      setProfilePicture(user.profilePicture || "");
+      setProfilePicture(user?.profilePicture || "");
+      setImageError(false);
     }
   }, [user]);
 
@@ -41,6 +43,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
       username
     )}&background=random`;
     setProfilePicture(newAvatarUrl);
+    setImageError(false);
   };
 
   const handleSave = async () => {
@@ -61,9 +64,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
     }
   };
 
-  if (!user) {
-    return null; // or a loader if you want
-  }
+  if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,8 +75,15 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
         <div className="flex flex-col items-center py-4">
           <Avatar className="h-24 w-24 mb-4">
-            <AvatarImage src={profilePicture} alt={username} />
-            <AvatarFallback>{username?.charAt(0) || "U"}</AvatarFallback>
+            {!imageError && profilePicture ? (
+              <AvatarImage
+                src={profilePicture}
+                alt={username}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <AvatarFallback>{username?.charAt(0) || "U"}</AvatarFallback>
+            )}
           </Avatar>
 
           <Button variant="outline" onClick={generateAvatar} className="mb-6">
@@ -98,7 +106,10 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
               <Input
                 id="avatar"
                 value={profilePicture}
-                onChange={(e) => setProfilePicture(e.target.value)}
+                onChange={(e) => {
+                  setProfilePicture(e.target.value);
+                  setImageError(false);
+                }}
                 placeholder="https://example.com/avatar.png"
               />
               <p className="text-xs text-muted-foreground">
