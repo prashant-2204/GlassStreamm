@@ -1,14 +1,15 @@
-
 import { useEffect, useState } from "react";
 import { tmdbApi, Movie } from "@/services/tmdbApi";
 import MovieRow from "@/components/MovieRow";
 import NavBar from "@/components/NavBar";
+import LoginModal from "@/components/LoginModal";
 
 const Index = () => {
   const [trendingMovies, setTrendingMovies] = useState<Movie[] | null>(null);
   const [popularMovies, setPopularMovies] = useState<Movie[] | null>(null);
   const [topRatedMovies, setTopRatedMovies] = useState<Movie[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -28,6 +29,9 @@ const Index = () => {
     };
 
     fetchMovies();
+
+    // Open login modal on page load
+    setLoginModalOpen(true);
   }, []);
 
   return (
@@ -60,8 +64,11 @@ const Index = () => {
           isLoading={loading}
         />
       </main>
+
+      <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </div>
   );
 };
 
 export default Index;
+
