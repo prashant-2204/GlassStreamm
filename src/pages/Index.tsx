@@ -32,10 +32,7 @@ const Index = () => {
     fetchMovies();
 
     // Show login modal only if user is not authenticated
-    if (!userService.isAuthenticated()) {
-      setLoginModalOpen(true);
-    }
-  }, []);
+    
 
   return (
     <div className="min-h-screen flex flex-col">
