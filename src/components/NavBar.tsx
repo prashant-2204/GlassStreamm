@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, User, Bookmark, Home, Film, LogOut } from "lucide-react";
@@ -23,11 +22,10 @@ const NavBar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  
-  // Get current user
+
   const currentUser = userService.getCurrentUser();
   const isAuthenticated = userService.isAuthenticated();
-  
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -35,14 +33,13 @@ const NavBar = () => {
       setSearchQuery("");
     }
   };
-  
+
   const handleLogin = () => {
     setLoginModalOpen(true);
   };
-  
+
   const handleLogout = () => {
     userService.logout();
-    // Refresh the page to update state
     window.location.reload();
   };
 
@@ -101,14 +98,13 @@ const NavBar = () => {
 
           <div className="hidden md:flex items-center gap-2">
             <NavItems />
-            
-            {isAuthenticated ? (
+            {isAuthenticated && currentUser ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={currentUser.profilePicture} alt={currentUser.username} />
-                      <AvatarFallback>{currentUser.username.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{currentUser.username?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -116,7 +112,7 @@ const NavBar = () => {
                   <div className="flex items-center justify-start gap-2 p-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={currentUser.profilePicture} alt={currentUser.username} />
-                      <AvatarFallback>{currentUser.username.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{currentUser.username?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col space-y-0.5">
                       <p className="text-sm font-medium">{currentUser.username}</p>
@@ -154,14 +150,14 @@ const NavBar = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </form>
-              
+
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="ml-2">
-                    {isAuthenticated ? (
+                    {isAuthenticated && currentUser ? (
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={currentUser.profilePicture} alt={currentUser.username} />
-                        <AvatarFallback>{currentUser.username.charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback>{currentUser.username?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                       </Avatar>
                     ) : (
                       <User className="h-5 w-5" />
@@ -170,11 +166,11 @@ const NavBar = () => {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[250px] glass-card">
                   <div className="py-6">
-                    {isAuthenticated ? (
+                    {isAuthenticated && currentUser ? (
                       <div className="flex items-center gap-3 mb-6">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={currentUser.profilePicture} alt={currentUser.username} />
-                          <AvatarFallback>{currentUser.username.charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarFallback>{currentUser.username?.charAt(0)?.toUpperCase() || "U"}</AvatarFallback>
                         </Avatar>
                         <div>
                           <h3 className="font-medium">{currentUser.username}</h3>
@@ -182,21 +178,19 @@ const NavBar = () => {
                       </div>
                     ) : (
                       <div className="mb-6">
-                        <Button variant="default" className="w-full mb-2" onClick={() => {
-                          setLoginModalOpen(true);
-                        }}>
+                        <Button variant="default" className="w-full mb-2" onClick={handleLogin}>
                           Log In
                         </Button>
                       </div>
                     )}
-                    
+
                     <h2 className="text-lg font-semibold mb-4">Menu</h2>
                     <NavItems />
-                    
+
                     {isAuthenticated && (
-                      <Button 
-                        variant="outline" 
-                        className="w-full mt-4 justify-start" 
+                      <Button
+                        variant="outline"
+                        className="w-full mt-4 justify-start"
                         onClick={handleLogout}
                       >
                         <LogOut className="mr-2 h-5 w-5" />
@@ -210,13 +204,11 @@ const NavBar = () => {
           )}
         </div>
       </header>
-      
-      <LoginModal 
-        isOpen={loginModalOpen} 
-        onClose={() => setLoginModalOpen(false)}
-      />
+
+      <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </>
   );
 };
 
 export default NavBar;
+
