@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import MoviesPage from "./pages/MoviesPage";
 import SearchResults from "./pages/SearchResults";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Layout from "@/components/Layout"; // 👈 Import the new layout
 
 const queryClient = new QueryClient();
 
@@ -21,12 +21,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-          <Route path="/saved" element={<SavedMovies />} />
-          <Route path="/movies" element={<MoviesPage />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Index />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+            <Route path="/saved" element={<SavedMovies />} />
+            <Route path="/movies" element={<MoviesPage />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
@@ -35,3 +37,4 @@ const App = () => (
 );
 
 export default App;
+

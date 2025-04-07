@@ -39,10 +39,11 @@ const NavBar = () => {
     setLoginModalOpen(true);
   };
 
-  const handleLogout = () => {
-    userService.logout();
-    window.location.reload();
-  };
+const handleLogout = () => {
+  userService.logout();
+  navigate("/"); // redirect to home page
+  window.location.reload(); // optional
+};
 
   const NavItems = () => (
     <div className={cn("flex flex-col gap-1 w-full", !isMobile && "flex-row items-center")}>

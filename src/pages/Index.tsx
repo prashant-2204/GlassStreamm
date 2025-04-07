@@ -3,6 +3,7 @@ import { tmdbApi, Movie } from "@/services/tmdbApi";
 import MovieRow from "@/components/MovieRow";
 import NavBar from "@/components/NavBar";
 import LoginModal from "@/components/LoginModal";
+import { userService } from "@/services/userService";
 
 const Index = () => {
   const [trendingMovies, setTrendingMovies] = useState<Movie[] | null>(null);
@@ -30,14 +31,16 @@ const Index = () => {
 
     fetchMovies();
 
-    // Open login modal on page load
-    setLoginModalOpen(true);
+    // Show login modal only if user is not authenticated
+    if (!userService.isAuthenticated()) {
+      setLoginModalOpen(true);
+    }
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <NavBar />
-      
+
       <main className="flex-1 container px-4 py-6 max-w-7xl mx-auto">
         <section className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome to GlassStream</h1>
@@ -45,7 +48,7 @@ const Index = () => {
             Discover and enjoy your favorite movies in one place
           </p>
         </section>
-        
+
         <MovieRow 
           title="Trending Now" 
           movies={trendingMovies} 

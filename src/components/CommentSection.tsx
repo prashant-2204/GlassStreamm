@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { UserComment, userService } from "@/services/userService";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -18,9 +17,11 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  
+
   const currentUser = userService.getCurrentUser();
   const isAuthenticated = userService.isAuthenticated();
+
+  const avatarFallback = currentUser?.username?.charAt(0).toUpperCase() || "?";
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -29,27 +30,22 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
       setComments(fetchedComments);
       setIsLoading(false);
     };
-    
     fetchComments();
   }, [movieId]);
-  
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!newComment.trim() || isSubmitting) return;
-    
+
     if (!isAuthenticated) {
       setLoginModalOpen(true);
       return;
     }
-    
+
     setIsSubmitting(true);
-    
     try {
       const addedComment = await userService.addComment(movieId, newComment.trim());
-      
       if (addedComment) {
-        // Add the new comment to the list
         setComments(prev => [addedComment, ...prev]);
         setNewComment("");
       }
@@ -59,16 +55,14 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
       setIsSubmitting(false);
     }
   };
-  
+
   const handleDeleteComment = async (commentId: string) => {
     const success = await userService.deleteComment(commentId);
-    
     if (success) {
-      // Remove the deleted comment from the list
       setComments(prev => prev.filter(comment => comment._id !== commentId));
     }
   };
-  
+
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "MMM d, yyyy 'at' h:mm a");
@@ -76,23 +70,25 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
       return "Invalid date";
     }
   };
-  
+
   const handleLoginSuccess = () => {
-    // If we were trying to add a comment, submit it now
     if (newComment.trim()) {
       handleSubmitComment({ preventDefault: () => {} } as React.FormEvent);
     }
   };
-  
+
   return (
     <div className="mt-12">
       <h3 className="text-2xl font-semibold mb-4">Comments</h3>
-      
+
       <form onSubmit={handleSubmitComment} className="mb-8">
         <div className="flex items-start gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={currentUser.profilePicture} alt={currentUser.username} />
-            <AvatarFallback>{currentUser.username.charAt(0).toUpperCase()}</AvatarFallback>
+            {currentUser?.profilePicture ? (
+              <AvatarImage src={currentUser.profilePicture} alt={currentUser.username || "User"} />
+            ) : (
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            )}
           </Avatar>
           <div className="flex-1 space-y-2">
             <Textarea
@@ -102,17 +98,14 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
               className="min-h-[80px] bg-background/50"
             />
             <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={!newComment.trim() || isSubmitting}
-              >
+              <Button type="submit" disabled={!newComment.trim() || isSubmitting}>
                 {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
             </div>
           </div>
         </div>
       </form>
-      
+
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((_, i) => (
@@ -131,8 +124,11 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
           {comments.map((comment) => (
             <div key={comment._id} className="flex gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={comment.profilePicture} alt={comment.username} />
-                <AvatarFallback>{comment.username.charAt(0).toUpperCase()}</AvatarFallback>
+                {comment.profilePicture ? (
+                  <AvatarImage src={comment.profilePicture} alt={comment.username} />
+                ) : (
+                  <AvatarFallback>{comment.username.charAt(0).toUpperCase()}</AvatarFallback>
+                )}
               </Avatar>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
@@ -142,8 +138,7 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
                       {formatDate(comment.createdAt)}
                     </p>
                   </div>
-                  
-                  {isAuthenticated && comment.userId === currentUser._id && (
+                  {isAuthenticated && currentUser && comment.userId === currentUser._id && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -164,9 +159,9 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
           <p className="text-muted-foreground">No comments yet. Be the first to comment!</p>
         </div>
       )}
-      
-      <LoginModal 
-        isOpen={loginModalOpen} 
+
+      <LoginModal
+        isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSuccess={handleLoginSuccess}
       />
@@ -175,3 +170,4 @@ const CommentSection = ({ movieId }: CommentSectionProps) => {
 };
 
 export default CommentSection;
+

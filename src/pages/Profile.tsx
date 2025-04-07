@@ -9,16 +9,27 @@ import ProfileEditModal from "@/components/ProfileEditModal";
 import { userService, User as UserType } from "@/services/userService";
 
 const Profile = () => {
-  const [user, setUser] = useState<UserType>(userService.getCurrentUser());
+  const [user, setUser] = useState<UserType | null>(userService.getCurrentUser());
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen">
+        <NavBar />
+        <div className="flex justify-center items-center h-[80vh]">
+          <p className="text-muted-foreground text-lg">Please log in to view your profile.</p>
+        </div>
+      </div>
+    );
+  }
 
   const savedMoviesCount = userService.getSavedMovies().length;
   const likedMoviesCount = userService.getLikedMovies().length;
 
   const handleUserUpdate = (updatedUser: UserType) => {
     setUser(updatedUser);
-    setImageError(false); // Reset image error in case user updated a working image
+    setImageError(false);
   };
 
   return (
@@ -29,14 +40,14 @@ const Profile = () => {
         <Card className="glass-card p-6 mb-8">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <Avatar className="h-24 w-24 border-2 border-primary">
-              {!imageError && user.profilePicture ? (
+              {!imageError && user?.profilePicture ? (
                 <AvatarImage
                   src={user.profilePicture}
                   alt={user.username}
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <AvatarFallback>{user.username.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || "?"}</AvatarFallback>
               )}
             </Avatar>
 
@@ -78,7 +89,6 @@ const Profile = () => {
 
           <TabsContent value="activity" className="py-4">
             <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
-
             <div className="space-y-4">
               <Card className="p-4 glass-card">
                 <p className="text-lg">
@@ -89,7 +99,6 @@ const Profile = () => {
                   to see your collection
                 </p>
               </Card>
-
               <Card className="p-4 glass-card">
                 <h3 className="text-lg font-medium mb-2">Top Movie Genres</h3>
                 <p className="text-muted-foreground">
@@ -101,7 +110,6 @@ const Profile = () => {
 
           <TabsContent value="preferences" className="py-4">
             <h2 className="text-2xl font-semibold mb-4">App Preferences</h2>
-
             <Card className="p-6 glass-card">
               <div className="space-y-6">
                 <div>
@@ -113,7 +121,6 @@ const Profile = () => {
                     Edit Profile
                   </Button>
                 </div>
-
                 <div>
                   <h3 className="text-lg font-medium mb-2">App Theme</h3>
                   <p className="text-muted-foreground mb-3">
