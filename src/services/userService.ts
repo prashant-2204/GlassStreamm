@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 // ✅ Set base URL for all API calls (use "" for relative paths)
-const API_BASE_URL = "https://glassstream-production.up.railway.app/api";
+const API_BASE_URL = "https://glassstream.onrender.com/api";
 
 
 // Type definitions
